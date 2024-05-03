@@ -390,7 +390,7 @@ def process_generation(_sd_type, _model_type, _upload_images, _num_steps, style_
             raise NotImplementedError("You should choice between original and Photomaker!",f"But you choice {_model_type}")
         total_results = [real_images[-1]] + total_results
         yield total_results
-    if _comic_type != "No typesetting (default)":
+    if _comic_type != "No typesetting":
         captions= prompt_array.splitlines()
         captions = [caption.replace("[NC]","") for caption in captions]
         captions = [caption.split('#')[-1] if "#" in caption else caption for caption in captions]
@@ -450,28 +450,27 @@ class Predictor(BasePredictor):
     def predict(
         self,
         input_image: Path = Input(),
-        sd_type: str = Input(default="Unstable"),
-        num_steps: int = Input(default=50),
-        Ip_Adapter_Strength: float = Input(default=0.5),
-        style_strength_ratio: int = Input(default=20),
-        guidance_scale: int = Input(default=5),
-        comic_type: str = Input(default="Classic Comic Style"),
-        seed_: int = Input(default=1),
-        sa32_: float = Input(default=0.5),
-        sa64_: float = Input(default=0.5),
-        id_length_: int = Input(default=3),
-        general_prompt: str = Input(default="a woman img, wearing a white T-shirt, blue loose hair"),
-        negative_prompt: str = Input(default="bad anatomy, bad hands, missing fingers, extra fingers, three hands, three legs, bad arms, missing legs, missing arms, poorly drawn face, bad face, fused face, cloned face, three crus, fused feet, fused thigh, extra crus, ugly fingers, horn, cartoon, cg, 3d, unreal, animate, amputation, disconnected limbs"),
-        prompt_array: str = Input(default="wake up in the bed\nhave breakfast\nis on the road, go to company\nwork in the company\nTake a walk next to the company at noon\nlying in bed at night"),
-        style: str = Input(default="Japanese Anime"),
-        model_type: str = Input(default="Using Ref Images"),
-        G_height: int = Input(default=768),
-        G_width: int = Input(default=768),
+        style: str = Input(default="Japanese Anime", description="Style template: '(No style)', 'Japanese Anime', 'Cinematic', 'Disney Character', 'Photographic', 'Comic book', 'Line art'"),
+        style_strength_ratio: int = Input(default=20, description="Style strength of Ref Image (%)"),
+        model_type: str = Input(choices=["Only Using Textual Description", "Using Ref Images"], default="Using Ref Images", description="Control type of the Character"),
+        general_prompt: str = Input(default="a woman img, wearing a white T-shirt, blue loose hair", description="Textual Description for Character"),
+        negative_prompt: str = Input(default="bad anatomy, bad hands, missing fingers, extra fingers, three hands, three legs, bad arms, missing legs, missing arms, poorly drawn face, bad face, fused face, cloned face, three crus, fused feet, fused thigh, extra crus, ugly fingers, horn, cartoon, cg, 3d, unreal, animate, amputation, disconnected limbs", description="Negative Prompt"),
+        prompt_array: str = Input(default="wake up in the bed\nhave breakfast\nis on the road, go to company\nwork in the company\nTake a walk next to the company at noon\nlying in bed at night", description="Comic Description (each line corresponds to a frame)."),
+        Ip_Adapter_Strength: float = Input(default=0.5, description="Ip Adapter Strength"),
+        sa32_: float = Input(default=0.5, description="The degree of Paired Attention at 32 x 32 self-attention layers"),
+        sa64_: float = Input(default=0.5, description="The degree of Paired Attention at 64 x 64 self-attention layers"),
+        id_length_: int = Input(default=3, description="Number of id images in total images"),
+        seed_: int = Input(default=1, description="Seed"),
+        num_steps: int = Input(default=50, description="Number of sample steps"),
+        G_height: int = Input(default=768, description="Height"),
+        G_width: int = Input(default=768, description="Width"),
+        comic_type: str = Input(choices=["Classic Comic Style", "No typesetting"], default="Classic Comic Style", description="Typesetting Style"),
+        guidance_scale: int = Input(default=5, description="Guidance scale"),
     ) -> List[Path]:
         input_image = Image.open(input_image)
         input_image.save("/content/StoryDiffusion-hf/examples/taylor/1.jpeg")
         files=get_image_path_list('/content/StoryDiffusion-hf/examples/taylor')
-        images = process_generation(sd_type, model_type, files, num_steps,style, Ip_Adapter_Strength, style_strength_ratio, guidance_scale, seed_, sa32_, sa64_, id_length_, general_prompt, negative_prompt, prompt_array, G_height, G_width, comic_type, self.pipe2, self.pipe4)
+        images = process_generation("Unstable", model_type, files, num_steps,style, Ip_Adapter_Strength, style_strength_ratio, guidance_scale, seed_, sa32_, sa64_, id_length_, general_prompt, negative_prompt, prompt_array, G_height, G_width, comic_type, self.pipe2, self.pipe4)
         image_objects = save_images_and_collect_paths(images)
         save_path = "/content"
         unique_images_paths = remove_duplicates_and_save(image_objects, save_path)
