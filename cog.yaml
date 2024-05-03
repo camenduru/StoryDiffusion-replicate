@@ -1,0 +1,11 @@
+build:
+  gpu: true
+  cuda: "12.1"
+  python_version: "3.10"
+  run:
+    - apt update -y && apt install -y software-properties-common python3-launchpadlib && apt update -y && add-apt-repository -y ppa:git-core/ppa && apt update -y
+    - apt install -y gcc g++ aria2 git git-lfs wget libgl1 libglib2.0-0 ffmpeg cmake libgtk2.0-0 libopenmpi-dev
+    - pip install -q torch==2.2.1+cu121 torchvision==0.17.1+cu121 torchaudio==2.2.1+cu121 torchtext==0.17.1 torchdata==0.7.1 --extra-index-url https://download.pytorch.org/whl/cu121 -U
+    - pip install notebook pyngrok pickleshare ipywidgets opencv-python imageio imageio-ffmpeg diffusers transformers accelerate xformers==0.0.25 gradio pydantic==1.10.15 omegaconf peft Pillow==9.5.0
+    - GIT_LFS_SKIP_SMUDGE=1 git clone -b dev https://github.com/camenduru/StoryDiffusion-hf /content/StoryDiffusion-hf
+predict: "/src/predict.py:Predictor"
