@@ -3,7 +3,7 @@
 🥳 Please join my patreon community https://patreon.com/camenduru <br />
 
 ### 🕸 Replicate
-https://replicate.com/camenduru/story-diffusion
+https://replicate.com/hvision-nku/storydiffusion
 
 ### 🧬 Code
 https://github.com/HVision-NKU/StoryDiffusion
